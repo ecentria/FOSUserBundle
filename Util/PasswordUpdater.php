@@ -12,8 +12,9 @@
 namespace FOS\UserBundle\Util;
 
 use FOS\UserBundle\Model\UserInterface;
-use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\Encoder\SelfSaltingEncoderInterface;
 
 /**
  * Class updating the hashed password in the user when there is a new password.
@@ -39,7 +40,7 @@ class PasswordUpdater implements PasswordUpdaterInterface
 
         $encoder = $this->encoderFactory->getEncoder($user);
 
-        if ($encoder instanceof BCryptPasswordEncoder) {
+        if ($encoder instanceof NativePasswordEncoder || $encoder instanceof SelfSaltingEncoderInterface) {
             $user->setSalt(null);
         } else {
             $salt = rtrim(str_replace('+', '.', base64_encode(random_bytes(32))), '=');
